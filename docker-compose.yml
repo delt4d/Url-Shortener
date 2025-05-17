@@ -1,0 +1,10 @@
+﻿services:
+  postgres:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_DB: urlshortdb
+      POSTGRES_USER: urlshortuser
+      POSTGRES_PASSWORD: urlshortpassword
+    ports:
+      - "5432:5432"

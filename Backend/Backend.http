@@ -1,0 +1,19 @@
+@HostAddress = http://localhost:5103
+
+GET {{HostAddress}}/healthcheck
+
+###
+
+POST {{HostAddress}}/shorten-url
+Accept: application/json
+Content-Type: application/json
+
+{
+  "url": "http://localhost:5103/healthcheck"
+}
+
+###
+
+GET {{HostAddress}}/s/
+
+###
