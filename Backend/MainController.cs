@@ -18,7 +18,12 @@ public class MainController(
     public async Task<IResult> CreateShortenUrl(CreateShortenUrlDto data)
     {
         var result = await createShortUrl.ExecuteAsync(data.Url);
-        return Results.Json(result);
+        
+        return Results.Json(new
+        {
+            result.OriginalUrl,
+            ShortenUrl = $"http://localhost:5103/s/{result.ShortUrl}"
+        });
     }
     
     [HttpGet("/s/{shortUrl}")]

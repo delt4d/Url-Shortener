@@ -18,5 +18,10 @@ public class ShortUrl
         Value = value;
     }
 
+    public override string ToString()
+    {
+        return Value;
+    }
+
     private char GetRandomChar() => AllowedChars[_random.Next(AllowedChars.Length)];
 }
