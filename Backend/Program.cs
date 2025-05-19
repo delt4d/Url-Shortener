@@ -6,5 +6,6 @@ builder.ConfigureServices();
 var app = builder.Build();
 
 app.UseHttpsRedirection();
+app.UseCors("development");
 app.MapControllers();
 app.Run();
