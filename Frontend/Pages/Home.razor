@@ -1,0 +1,83 @@
+﻿@page "/"
+@inject IUrlShortenerService UrlShortenerService
+
+<PageTitle>URL Shortener</PageTitle>
+
+<MudContainer class="container">
+    <MudContainer class="content" MaxWidth="MaxWidth.Small">
+        @if (_state.ErrorMessage.Value is not null)
+        {
+            <MudText Color="Color.Error" Style="text-align: center;">@_state.ErrorMessage.Value</MudText>
+            <br/>
+        }
+
+        <MudTextField T="string"
+                      @bind-Value="_state.OriginalUrl"
+                      Label="Paste the URL Here"
+                      InputType="InputType.Url"
+                      InputMode="InputMode.url"
+                      Variant="Variant.Outlined"
+                      Immediate="true"
+                      FullWidth="true"/>
+
+        <MudButton Variant="Variant.Filled"
+                   Class="mt-1"
+                   Size="Size.Large"
+                   Color="Color.Primary"
+                   OnClick="ShortenUrlAsync">
+            Generate Shortened URL
+        </MudButton>
+
+        <br/>
+
+        @if (_state.ShortenUrl is not null)
+        {
+            <br/>
+            <CopyToClipboard InputValue="@_state.ShortenUrl"/>
+        }
+    </MudContainer>
+</MudContainer>
+
+<style>
+    .container {
+        height: 100%;
+        display: grid;
+        place-items: center;
+    }
+    
+    .content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+</style>
+
+@code {
+    HomeState _state = new();
+
+    private async Task ClearAsync()
+    {
+        _state.ShortenUrl = null;
+        await _state.ErrorMessage.CancelAsync();
+        StateHasChanged();
+    }
+
+    public async Task ShortenUrlAsync()
+    {
+        await ClearAsync();
+        
+        try
+        {
+            if (string.IsNullOrWhiteSpace(_state.OriginalUrl))
+                throw new Exception("Original URL must have a value.");
+            
+            var result = await UrlShortenerService.ShortenUrlAsync(_state.OriginalUrl);
+            _state.ShortenUrl = result.ShortenUrl;
+        }
+        catch (Exception ex)
+        {
+            await _state.ErrorMessage.UpdateValueAsync(ex.Message, TimeSpan.FromSeconds(20));
+            StateHasChanged();
+        }
+    }
+}

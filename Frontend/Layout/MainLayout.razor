@@ -1,0 +1,31 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider/>
+<MudPopoverProvider/>
+
+<MudLayout id="layout">
+    <MudAppBar>
+        URL Shortener
+    </MudAppBar>
+    <MudMainContent id="main-content">
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+<style>
+    #layout {
+        height: calc(100vh - @AppBarHeight);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    #main-content {
+        flex: 1;
+    }
+</style>
+
+@code {
+
+    int AppBarHeight { get; } = 64;
+
+}
