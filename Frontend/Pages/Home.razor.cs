@@ -6,35 +6,38 @@ public partial class Home : ComponentBase
 {
     private class ErrorMessageValue
     {
-        private string? _value = string.Empty;
         private CancellationTokenSource? CancellationTokenSource { get; set; }
 
-        public string? Value { get => _value; }
+        public string? Value { get; private set; } = string.Empty;
 
-        public async Task CancelAsync()
+        public async Task ClearAsync()
         {
             if (CancellationTokenSource is not null)
             {
-                await CancellationTokenSource.CancelAsync();
+                if (CancellationTokenSource.Token.CanBeCanceled)
+                    await CancellationTokenSource.CancelAsync();
+
                 CancellationTokenSource = null;
             }
+
+            Value = null;
         }
 
-        public async Task UpdateValueAsync(string? value, TimeSpan delay)
+        public async Task UpdateValueAsync(string? value, TimeSpan delay, Action onTimeout)
         {
-            await CancelAsync();
+            await ClearAsync();
+            Value = value;
+            RegisterClearTimeout(delay, onTimeout);
+        }
 
-            _value = value;
-
+        private void RegisterClearTimeout(TimeSpan delay, Action onTimeout)
+        {
             Task.Run(async () =>
             {
                 using (CancellationTokenSource = new CancellationTokenSource())
-                {
-                    await Task.Delay(delay);
-                    _value = null;
-                }
-
-                CancellationTokenSource = null;
+                    await Task.Delay(delay, CancellationTokenSource.Token);
+                await ClearAsync();
+                onTimeout();
             });
         }
     }

@@ -1,12 +1,14 @@
 ﻿using Backend.Configuration;
 using Backend.Features.ShortenUrl;
 using Backend.Models;
+using Backend.Models.Dtos;
+using Backend.Models.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Backend;
+namespace Backend.Controllers;
 
 [ApiController]
-public class MainController(
+public class UrlShortenerController(
     ICreateShortUrlUseCase createShortUrl,
     IFindShortUrlUseCase findShortUrl,
     IEnvService envService) : ControllerBase
@@ -17,13 +19,16 @@ public class MainController(
     [HttpPost("/shorten-url")]
     public async Task<IResult> CreateShortenUrl(CreateShortenUrlDto data)
     {
-        var result = await createShortUrl.ExecuteAsync(data.Url);
-        
-        return Results.Json(new
+        try
         {
-            result.OriginalUrl,
-            ShortenUrl = $"http://localhost:5103/s/{result.ShortUrl}"
-        });
+            var result = await createShortUrl.ExecuteAsync(data.Url);
+            var dto = new CreateShortenUrlResultDto(result.OriginalUrl, result.ShortUrl);
+            return dto.ToResult();  
+        }
+        catch (OriginalUrlFormatException ex)
+        {
+            return Results.BadRequest(ex.Message);
+        }
     }
     
     [HttpGet("/s/{shortUrl}")]
@@ -35,7 +40,7 @@ public class MainController(
             var originalUrl = result.OriginalUrl;
             return envService.IsDev ? Redirect(originalUrl) : RedirectPermanent(originalUrl);
         }
-        catch (ShortUrlNotFound ex)
+        catch (ShortUrlNotFoundException ex)
         {
             return NotFound(ex.Message);
         }

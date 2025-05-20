@@ -1,22 +1,26 @@
-﻿namespace Backend.Models;
+﻿using Backend.Configuration;
+using Backend.Models.Entities;
+using Backend.Models.ValueObjects;
+
+namespace Backend.Models;
 
 public class Url
 {
     public Guid Id { get; }
-    public string OriginalUrl { get; set; }
-    public ShortUrl ShortUrl { get; set; }
+    public OriginalUrlValue OriginalUrl { get; set; }
+    public ShortUrlValue ShortUrl { get; set; }
 
-    public Url(string originalUrl)
+    public Url(OriginalUrlValue originalUrl)
     {
         Id = Guid.NewGuid();
         OriginalUrl = originalUrl;
-        ShortUrl = new ShortUrl();
+        ShortUrl = new ShortUrlValue();
     }
 
     public Url(UrlEntity entity)
     {
         Id = entity.Id;
         OriginalUrl = entity.OriginalUrl;
-        ShortUrl = new ShortUrl(entity.ShortUrl);
+        ShortUrl = entity.ShortUrl;
     }
 }

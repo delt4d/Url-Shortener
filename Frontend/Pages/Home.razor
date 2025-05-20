@@ -55,11 +55,11 @@
 @code {
     HomeState _state = new();
 
-    private async Task ClearAsync()
+    private Task ClearAsync()
     {
         _state.ShortenUrl = null;
-        await _state.ErrorMessage.CancelAsync();
-        StateHasChanged();
+        // await _state.ErrorMessage.ClearAsync();
+        return Task.CompletedTask;
     }
 
     public async Task ShortenUrlAsync()
@@ -69,15 +69,16 @@
         try
         {
             if (string.IsNullOrWhiteSpace(_state.OriginalUrl))
-                throw new Exception("Original URL must have a value.");
+                throw new Exception("Input must have a value.");
             
             var result = await UrlShortenerService.ShortenUrlAsync(_state.OriginalUrl);
             _state.ShortenUrl = result.ShortenUrl;
         }
         catch (Exception ex)
         {
-            await _state.ErrorMessage.UpdateValueAsync(ex.Message, TimeSpan.FromSeconds(20));
-            StateHasChanged();
+            await _state.ErrorMessage.UpdateValueAsync(ex.Message, TimeSpan.FromSeconds(5), StateHasChanged);
         }
+        
+        StateHasChanged();
     }
 }

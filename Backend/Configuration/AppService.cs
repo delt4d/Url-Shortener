@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Configuration;
 
-public static class AppServices
+public static class AppService
 {
     public static void ConfigureServices(this WebApplicationBuilder builder)
     {
