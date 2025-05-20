@@ -12,33 +12,46 @@ public partial class Home : ComponentBase
 
         public async Task ClearAsync()
         {
-            if (CancellationTokenSource is not null)
+            try
             {
-                if (CancellationTokenSource.Token.CanBeCanceled)
+                if (CancellationTokenSource is not null)
                     await CancellationTokenSource.CancelAsync();
-
-                CancellationTokenSource = null;
             }
-
-            Value = null;
+            catch (ObjectDisposedException)
+            {
+            }
+            finally
+            {
+                CancellationTokenSource = null;
+                Value = null;
+            }
         }
 
-        public async Task UpdateValueAsync(string? value, TimeSpan delay, Action onTimeout)
+        public async Task UpdateValueAsync(string? value, TimeSpan delay, Action afterDelayAction)
         {
             await ClearAsync();
             Value = value;
-            RegisterClearTimeout(delay, onTimeout);
+            RegisterClearTimeout(delay, afterDelayAction);
         }
 
-        private void RegisterClearTimeout(TimeSpan delay, Action onTimeout)
+        private async void RegisterClearTimeout(TimeSpan delay, Action afterDelayAction)
         {
-            Task.Run(async () =>
+            try
             {
                 using (CancellationTokenSource = new CancellationTokenSource())
+                {
                     await Task.Delay(delay, CancellationTokenSource.Token);
-                await ClearAsync();
-                onTimeout();
-            });
+                }
+            }
+            catch (TaskCanceledException)
+            {
+            }
+            finally
+            {
+                CancellationTokenSource = null;
+                Value = null;
+                afterDelayAction();
+            }
         }
     }
     
@@ -46,6 +59,7 @@ public partial class Home : ComponentBase
     {
         public string OriginalUrl { get; set; } = string.Empty;
         public string? ShortenUrl { get; set; }
-        public ErrorMessageValue ErrorMessage { get; set; } = new();
+        public ErrorMessageValue ErrorMessage { get; } = new();
+        public bool IsLoading { get; set; } = false;
     }
 }

@@ -8,7 +8,11 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5103") });
+builder.Services.AddScoped(sp => new HttpClient
+{
+    BaseAddress = new Uri("http://localhost:5103"),
+    Timeout = TimeSpan.FromSeconds(20)
+});
 builder.Services.AddTransient<IUrlShortenerService, UrlShortenerService>();
 builder.Services.AddMudServices();
 

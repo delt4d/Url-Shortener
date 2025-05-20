@@ -18,13 +18,15 @@
                       InputMode="InputMode.url"
                       Variant="Variant.Outlined"
                       Immediate="true"
-                      FullWidth="true"/>
+                      FullWidth="true"
+                      Disabled="_state.IsLoading" />
 
         <MudButton Variant="Variant.Filled"
                    Class="mt-1"
                    Size="Size.Large"
                    Color="Color.Primary"
-                   OnClick="ShortenUrlAsync">
+                   OnClick="ShortenUrlAsync"
+                   Disabled="_state.IsLoading" >
             Generate Shortened URL
         </MudButton>
 
@@ -53,30 +55,35 @@
 </style>
 
 @code {
-    HomeState _state = new();
+    readonly HomeState _state = new();
 
-    private Task ClearAsync()
+    private async Task ClearAsync()
     {
         _state.ShortenUrl = null;
-        // await _state.ErrorMessage.ClearAsync();
-        return Task.CompletedTask;
+        await _state.ErrorMessage.ClearAsync();
     }
 
     public async Task ShortenUrlAsync()
     {
         await ClearAsync();
-        
+
         try
         {
             if (string.IsNullOrWhiteSpace(_state.OriginalUrl))
                 throw new Exception("Input must have a value.");
-            
+
+            _state.IsLoading = true;
+
             var result = await UrlShortenerService.ShortenUrlAsync(_state.OriginalUrl);
             _state.ShortenUrl = result.ShortenUrl;
         }
         catch (Exception ex)
         {
             await _state.ErrorMessage.UpdateValueAsync(ex.Message, TimeSpan.FromSeconds(5), StateHasChanged);
+        }
+        finally
+        {
+            _state.IsLoading = false;
         }
         
         StateHasChanged();
