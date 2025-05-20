@@ -57,18 +57,13 @@
 @code {
     readonly HomeState _state = new();
 
-    private async Task ClearAsync()
-    {
-        _state.ShortenUrl = null;
-        await _state.ErrorMessage.ClearAsync();
-    }
-
     public async Task ShortenUrlAsync()
     {
-        await ClearAsync();
-
         try
         {
+            _state.ShortenUrl = null;
+            await _state.ErrorMessage.ClearAsync();
+
             if (string.IsNullOrWhiteSpace(_state.OriginalUrl))
                 throw new Exception("Input must have a value.");
 

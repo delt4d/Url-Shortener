@@ -1,9 +1,5 @@
 ﻿@inject IJSRuntime Js
 
-<MudText Class="mb-2" Color="Color.Success" Typo="Typo.subtitle2">
-    @_copyMessage
-</MudText>
-
 <MudTextField T="string"
               @bind-Value="InputValue"
               Variant="Variant.Text"
@@ -13,8 +9,18 @@
               OnAdornmentClick="_copyToClipboard"
               ReadOnly="true" />
 
+<MudPopover Open="_showPopover" 
+            OverflowBehavior="OverflowBehavior.FlipAlways" 
+            AnchorOrigin="Origin.BottomLeft" 
+            TransformOrigin="Origin.TopLeft" 
+            Paper="false">
+    <MudPaper Outlined="true" Class="py-2 px-2">
+        <MudText>Copied!</MudText>
+    </MudPaper>
+</MudPopover>
+
 @code {
-    private string _copyMessage = string.Empty;
+    private bool _showPopover = false;
     
     [Parameter] 
     public required string InputValue { get; set; }
@@ -22,9 +28,15 @@
     private async Task _copyToClipboard()
     {
         await Js.InvokeVoidAsync("navigator.clipboard.writeText", InputValue);
-        _copyMessage = "Copied!";
-        await Task.Delay(2000);
-        _copyMessage = "";
+        
+        TogglePopover(true);
+        await Task.Delay(TimeSpan.FromSeconds(2));
+        TogglePopover(false);
+    }
+
+    private void TogglePopover(bool value)
+    {
+        _showPopover = value;
         StateHasChanged();
     }
 }
