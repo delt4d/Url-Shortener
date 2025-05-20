@@ -17,4 +17,4 @@ cd UrlShortener/Frontend
 dotnet run
 ```
 
-Website URL: http://localhost:5265/.
+Client URL: http://localhost:5265/.
