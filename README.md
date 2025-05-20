@@ -5,7 +5,11 @@ ASP.NET Core and Blazor WebAssembly Url Shortener.
 
 ## Quick Start
 ```sh
+# Clone project
+git clone https://github.com/delt4d/Url-Shortener.git UrlShortener
+
 # Start docker containers
+cd UrlShortener
 docker compose up -d --build
 
 # Run the server
