@@ -1,7 +1,7 @@
 ﻿# URL Shortener
 ASP.NET Core and Blazor WebAssembly Url Shortener.
 
-![img.png](img.png)
+<img src="./img.png" />
 
 ## Quick Start
 ```sh
